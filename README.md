@@ -125,7 +125,7 @@ model, test_loss, test_acc = train_signet_model(
 ## 🏗️ Model Architecture
 
 - **Input**: 6 modalities (MTF, GAF, RP × original/scaled)
-- **Backbone**: MobileNet V2 (ImageNet pretrained)
+- **Backbone**: CNN_based_Backbone (ImageNet pretrained)
 - **Fusion**: Late concatenation + 3-layer MLP
 - **Output**: 3-class classification (irrigated_1/2/3)
 
