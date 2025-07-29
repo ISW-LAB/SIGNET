@@ -7,73 +7,57 @@
 This study presents a signal-to-image classification approach for analyzing plant bioelectrical responses under varying irrigation conditions. The proposed framework, SIGNET aims to enhance physiological interpretation and multi-class prediction performance in controlled environment agriculture.
 
 ## ✨ Features
-
+- **Modular Architecture**: Three independent Python modules
 - **Signal Preprocessing**: Automated outlier detection and cleaning
 - **Multi-Modal Encoding**: MTF, GAF, RP time-series to image conversion
 - **Deep Learning**: Multi-modal CNN based backbone
-- **One-Line Execution**: Complete pipeline from raw signals to trained model
+- **Easy Execution**: Single command pipeline with built-in configuration
 
 ## 🚀 Quick Start
 
 ### Installation
 ```bash
-pip install torch torchvision pandas numpy matplotlib scikit-learn Pillow tqdm
-git clone https://github.com/ISW-LAB/SIGNET.git
+pip install torch torchvision pandas numpy matplotlib scikit-learn Pillow tqdm scipy
+git clone https://github.com//ISW-LAB/SIGNET.git
 cd SIGNET
 ```
 
 ### Usage
+1. **Update data paths** in `main_pipeline.py`:
 ```python
-from signet_pipeline import run_complete_pipeline
-
-config = {
-    'signal_file_paths': [
-        "data/morning_signals.csv",
-        "data/noon_signals.csv", 
-        "data/evening_signals.csv"
-    ],
-    'output_base_dir': './signet_output',
-    'num_epochs': 50,
-    'batch_size': 32
-}
-
-# Run complete pipeline
-results = run_complete_pipeline(**config)
-print(f"Final Accuracy: {results['training']['test_accuracy']:.4f}")
+SIGNAL_FILE_PATHS = [
+    "data/morning.csv",
+    "data/noon.csv", 
+    "data/evening.csv"
+]
 ```
 
-## 📊 Pipeline Overview
-
-```
-Raw Signals → Preprocessing → MTF/GAF/RP Encoding → Multi-Modal CNN → Classification
-```
-
-### 3-Stage Process
-1. **Signal Preprocessing**: Clean and normalize electrical signals
-2. **Image Encoding**: Convert time series to visual representations
-3. **Model Training**: Multi-modal CNN classification (3 irrigation classes)
-
-## ⚙️ Configuration
-
-### Key Parameters
-```python
-{
-    # Data paths
-    'signal_file_paths': ["morning.csv", "noon.csv", "evening.csv"],
-    
-    # Signal processing
-    'window_size': 64,           # Sliding window size
-    'stride': 32,                # Window stride
-    'initial_trim': 1000,        # Remove unstable samples
-    
-    # Training
-    'num_epochs': 50,
-    'batch_size': 32,
-    'learning_rate': 0.001
-}
+2. **Run pipeline**:
+```bash
+python main_pipeline.py
 ```
 
-### Input Data Format
+## 📁 Files
+
+```
+signet/
+├── signal_preprocessing.py      # Signal cleaning
+├── signal_to_image.py          # MTF/GAF/RP conversion
+├── deep_learning_model.py      # Multi-modal CNN
+├── main_pipeline.py           # Main execution
+└── quick_start.py             # Simple test run
+```
+
+## ⚙️ Key Features
+
+- **Signal Preprocessing**: Outlier detection and cleaning
+- **Image Encoding**: MTF, GAF, RP time-series to image conversion
+- **Multi-Modal CNN**: 6 modalities → CNN_based backbone → 3-class output
+- **One-Command Execution**: Complete pipeline in single run
+
+## 📊 Data Format
+
+CSV files should contain:
 ```csv
 timestamp,DC_Voltage_CH103,DC_Voltage_CH104,DC_Voltage_CH105
 0,2.45,2.37,2.41
@@ -81,72 +65,80 @@ timestamp,DC_Voltage_CH103,DC_Voltage_CH104,DC_Voltage_CH105
 ...
 ```
 
-## 📁 Output Structure
+## 🔧 Configuration
+
+Edit `SIGNETConfig` in `main_pipeline.py`:
+
+```python
+PREPROCESSING = {
+    'initial_trim': 1000,        # Remove first N samples
+    'target_samples': 25000,     # Signal length
+    'iqr_multiplier': 2.0        # Outlier threshold
+}
+
+IMAGE_CONVERSION = {
+    'window_size': 64,           # Window size
+    'stride': 32,                # Window step
+    'save_format': SaveFormat.PNG
+}
+
+TRAINING = {
+    'num_epochs': 30,
+    'batch_size': 32,
+    'learning_rate': 0.001
+}
+```
+
+## 📈 Architecture
+
+```
+Raw Signals → Preprocessing → MTF/GAF/RP Images → Multi-Modal CNN → 3 Classes
+```
+
+- **Input**: 6 modalities (MTF, GAF, RP × original/scaled)
+- **Backbone**: Custom CNN based Backbone
+- **Output**: irrigated_1, irrigated_2, irrigated_3
+
+## 🛠️ Commands
+
+```bash
+python main_pipeline.py                    # Complete pipeline
+python main_pipeline.py --step preprocessing  # Individual step
+python main_pipeline.py --config           # View settings
+python quick_start.py                      # Quick test
+```
+
+## 📁 Output
 
 ```
 signet_output/
-├── processed_signals/       # Cleaned signal data
-├── encoded_images/          # MTF/GAF/RP images  
-└── trained_models/          # Best model checkpoint
+├── processed_signals/    # Cleaned CSV files
+├── encoded_images/       # MTF/GAF/RP images
+└── trained_models/       # Model checkpoints
 ```
 
-## 🔧 Individual Module Usage
+## 🔧 Individual Modules
 
-### Signal Preprocessing Only
 ```python
-from signet_pipeline import preprocess_signals
+# Signal preprocessing only
+from signal_preprocessing import preprocess_signals
 
-morning_clean, noon_clean, evening_clean = preprocess_signals(
-    morning_data, noon_data, evening_data
-)
+# Image conversion only  
+from signal_to_image import convert_signals_to_images
+
+# Model training only
+from deep_learning_model import train_signet_model
 ```
 
-### Image Encoding Only
+## 🧪 Quick Test
+
+For testing with smaller data:
 ```python
-from signet_pipeline import convert_signals_to_images
-
-results = convert_signals_to_images(
-    signal_df=your_signals,
-    signal_columns=['CH-103', 'CH-104'],
-    window_size=64
-)
+# Edit in main_pipeline.py or quick_start.py
+PREPROCESSING['target_samples'] = 5000
+IMAGE_CONVERSION['window_size'] = 32  
+TRAINING['num_epochs'] = 10
 ```
-
-### Model Training Only
-```python
-from signet_pipeline import train_signet_model
-
-model, test_loss, test_acc = train_signet_model(
-    data_dir='path/to/images',
-    num_epochs=50
-)
-```
-
-## 🏗️ Model Architecture
-
-- **Input**: 6 modalities (MTF, GAF, RP × original/scaled)
-- **Backbone**: CNN_based_Backbone (ImageNet pretrained)
-- **Fusion**: Late concatenation + 3-layer MLP
-- **Output**: 3-class classification (irrigated_1/2/3)
-
-## 📈 Performance
-
-- **Accuracy**: >90% on test set
-- **Training Time**: ~ 4 hours (20 epochs, GPU)
-- **Memory**: ~4GB GPU memory
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/name`)
-3. Commit changes (`git commit -m 'Add feature'`)
-4. Push to branch (`git push origin feature/name`)
-5. Open Pull Request
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
 
 ## 📞 Contact Us
 
