@@ -59,9 +59,9 @@ signet/
 
 CSV files should contain:
 ```csv
-timestamp,DC_Voltage_CH103,DC_Voltage_CH104,DC_Voltage_CH105
-0,2.45,2.37,2.41
-1,2.46,2.38,2.42
+irrigated_1,irrigated_2,irrigated_3
+2.45,2.37,2.41
+2.46,2.38,2.42
 ...
 ```
 
