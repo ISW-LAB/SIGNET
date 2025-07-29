@@ -132,7 +132,7 @@ model, test_loss, test_acc = train_signet_model(
 ## 📈 Performance
 
 - **Accuracy**: >90% on test set
-- **Training Time**: ~30 minutes (50 epochs, GPU)
+- **Training Time**: ~ 4 hours (20 epochs, GPU)
 - **Memory**: ~4GB GPU memory
 
 ## 🤝 Contributing
